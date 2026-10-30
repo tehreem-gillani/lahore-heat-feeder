@@ -1,0 +1,90 @@
+Houses on the virtual feeder: 34
+Feeder energy 266.4 MWh/yr; peak 1-min 101.1 kW at 2018-06-04 23:50:00; peak hour 94.0 kW at 2018-06-05 00:00:00
+Hour of highest mean load by month: {1: 20, 2: 20, 3: 20, 4: 23, 5: 23, 6: 0, 7: 23, 8: 23, 9: 23, 10: 21, 11: 19, 12: 19}
+Hour of lowest mean load by month: {1: 4, 2: 4, 3: 4, 4: 9, 5: 11, 6: 12, 7: 10, 8: 11, 9: 10, 10: 9, 11: 4, 12: 4}
+Jun-Sep mean by hour (kW): [66.4, 63.4, 59.9, 56.5, 53.5, 49.8, 46.9, 44.4, 43.1, 38.3, 36.4, 36.7, 38.1, 40.5, 43.8, 45.8, 44.7, 44.2, 44.8, 47.0, 49.1, 52.7, 59.1, 66.5]
+Houses: slope median 77 W/K (IQR 44-120), T_b median 22.5 C, test R2 median 0.68, MAE 0.187 vs 0.390 kW (n=41); AC circuits slope median 38 W/K, R2 0.45 (n=33)
+Feeder fit: {'t_balance': 23.0, 'base_kw': 16.705, 'slope_kw_per_k': 2.809, 'r2_test': 0.837}
+A baseline:
+  75 kVA: {'loss_of_life_h': 2527.6, 'loss_of_life_days': 105.32, 'peak_K': 1.419, 'hs_max': 135.8, 'hs_max_time': '2018-06-05 01:37:00', 'hours_hs_above_120': 23.2, 'hours_K_above_1': 218.3, 'worst_day': '2018-06-05', 'worst_day_lol_h': 329.13, 'share_lol_jun_sep': 0.971, 'hs_days_above_120': 16}
+  100 kVA: {'loss_of_life_h': 199.5, 'loss_of_life_days': 8.31, 'peak_K': 1.064, 'hs_max': 102.6, 'hs_max_time': '2018-06-05 00:46:00', 'hours_hs_above_120': 0.0, 'hours_K_above_1': 1.7, 'worst_day': '2018-06-05', 'worst_day_lol_h': 10.41, 'share_lol_jun_sep': 0.897, 'hs_days_above_120': 0}
+  200 kVA: {'loss_of_life_h': 26.0, 'loss_of_life_days': 1.08, 'peak_K': 0.532, 'hs_max': 66.9, 'hs_max_time': '2018-06-13 17:27:00', 'hours_hs_above_120': 0.0, 'hours_K_above_1': 0.0, 'worst_day': '2018-06-05', 'worst_day_lol_h': 0.39, 'share_lol_jun_sep': 0.696, 'hs_days_above_120': 0}
+B adoption (100 kVA):
+  adopt 0.00 n= 0 plug-in      LoL    199.5 h  hs max  102.6  peak K 1.064  h>120    0.0  K>1 h    1.7  worst 2018-06-05 (10.41 h)  JunSep 0.897
+  adopt 0.25 n= 8 plug-in      LoL    209.5 h  hs max  103.5  peak K 1.075  h>120    0.0  K>1 h    2.5  worst 2018-06-05 (11.15 h)  JunSep 0.899
+  adopt 0.25 n= 8 random-delay LoL    209.4 h  hs max  103.5  peak K 1.075  h>120    0.0  K>1 h    2.5  worst 2018-06-05 (11.15 h)  JunSep 0.899
+  adopt 0.25 n= 8 after-peak   LoL    213.2 h  hs max  104.0  peak K 1.106  h>120    0.0  K>1 h    3.5  worst 2018-06-05 (11.51 h)  JunSep 0.9
+  adopt 0.25 n= 8 latest       LoL    202.7 h  hs max  102.6  peak K 1.064  h>120    0.0  K>1 h    1.7  worst 2018-06-05 (10.63 h)  JunSep 0.897
+  adopt 0.25 n= 8 valley-fill  LoL    203.0 h  hs max  102.8  peak K 1.064  h>120    0.0  K>1 h    1.7  worst 2018-06-05 (10.62 h)  JunSep 0.897
+  adopt 0.50 n=17 plug-in      LoL    217.3 h  hs max  104.1  peak K 1.080  h>120    0.0  K>1 h    3.0  worst 2018-06-05 (11.64 h)  JunSep 0.9
+  adopt 0.50 n=17 random-delay LoL    217.2 h  hs max  104.1  peak K 1.080  h>120    0.0  K>1 h    2.9  worst 2018-06-05 (11.64 h)  JunSep 0.9
+  adopt 0.50 n=17 after-peak   LoL    227.4 h  hs max  105.7  peak K 1.154  h>120    0.0  K>1 h    7.9  worst 2018-06-05 (12.59 h)  JunSep 0.904
+  adopt 0.50 n=17 latest       LoL    205.9 h  hs max  102.6  peak K 1.064  h>120    0.0  K>1 h    1.7  worst 2018-06-05 (10.89 h)  JunSep 0.897
+  adopt 0.50 n=17 valley-fill  LoL    206.4 h  hs max  103.0  peak K 1.064  h>120    0.0  K>1 h    1.7  worst 2018-06-05 (10.83 h)  JunSep 0.897
+  adopt 0.75 n=26 plug-in      LoL    229.3 h  hs max  105.0  peak K 1.090  h>120    0.0  K>1 h    3.8  worst 2018-06-05 (12.55 h)  JunSep 0.902
+  adopt 0.75 n=26 random-delay LoL    229.2 h  hs max  105.0  peak K 1.090  h>120    0.0  K>1 h    3.7  worst 2018-06-05 (12.55 h)  JunSep 0.902
+  adopt 0.75 n=26 after-peak   LoL    248.1 h  hs max  108.7  peak K 1.201  h>120    0.0  K>1 h   16.8  worst 2018-06-05 (14.25 h)  JunSep 0.908
+  adopt 0.75 n=26 latest       LoL    210.7 h  hs max  102.6  peak K 1.064  h>120    0.0  K>1 h    1.7  worst 2018-06-05 (11.26 h)  JunSep 0.897
+  adopt 0.75 n=26 valley-fill  LoL    211.0 h  hs max  103.2  peak K 1.064  h>120    0.0  K>1 h    1.7  worst 2018-06-05 (11.08 h)  JunSep 0.898
+  adopt 1.00 n=34 plug-in      LoL    242.1 h  hs max  105.9  peak K 1.101  h>120    0.0  K>1 h    4.7  worst 2018-06-05 (13.54 h)  JunSep 0.904
+  adopt 1.00 n=34 random-delay LoL    242.0 h  hs max  105.9  peak K 1.101  h>120    0.0  K>1 h    4.6  worst 2018-06-05 (13.54 h)  JunSep 0.904
+  adopt 1.00 n=34 after-peak   LoL    271.4 h  hs max  111.4  peak K 1.243  h>120    0.0  K>1 h   26.0  worst 2018-06-05 (16.14 h)  JunSep 0.913
+  adopt 1.00 n=34 latest       LoL    215.9 h  hs max  102.7  peak K 1.064  h>120    0.0  K>1 h    1.8  worst 2018-06-05 (11.67 h)  JunSep 0.897
+  adopt 1.00 n=34 valley-fill  LoL    215.6 h  hs max  103.4  peak K 1.064  h>120    0.0  K>1 h    1.7  worst 2018-06-05 (11.32 h)  JunSep 0.898
+C sensitivity (full adoption):
+  base                 plug-in      LoL    242.1 h  hs max  105.9  peak K 1.101  h>120    0.0  charging 11.26 MWh
+  base                 after-peak   LoL    271.4 h  hs max  111.4  peak K 1.243  h>120    0.0  charging 11.26 MWh
+  base                 latest       LoL    215.9 h  hs max  102.7  peak K 1.064  h>120    0.0  charging 11.26 MWh
+  base                 valley-fill  LoL    215.6 h  hs max  103.4  peak K 1.064  h>120    0.0  charging 11.26 MWh
+  base                 no scooters  LoL    199.5 h  hs max  102.6  peak K 1.064  h>120    0.0  charging 0.0 MWh
+  rating 75 kVA        plug-in      LoL   3794.7 h  hs max  141.3  peak K 1.468  h>120   53.6  charging 11.26 MWh
+  rating 75 kVA        after-peak   LoL   5320.1 h  hs max  148.9  peak K 1.657  h>120   85.0  charging 11.26 MWh
+  rating 75 kVA        latest       LoL   2815.4 h  hs max  135.9  peak K 1.419  h>120   26.7  charging 11.26 MWh
+  rating 75 kVA        valley-fill  LoL   2809.5 h  hs max  136.7  peak K 1.419  h>120   26.5  charging 11.26 MWh
+  rating 75 kVA        no scooters  LoL   2527.6 h  hs max  135.8  peak K 1.419  h>120   23.2  charging 0.0 MWh
+  rating 200 kVA       plug-in      LoL     26.9 h  hs max   67.4  peak K 0.550  h>120    0.0  charging 11.26 MWh
+  rating 200 kVA       after-peak   LoL     27.1 h  hs max   69.4  peak K 0.622  h>120    0.0  charging 11.26 MWh
+  rating 200 kVA       latest       LoL     26.6 h  hs max   67.0  peak K 0.532  h>120    0.0  charging 11.26 MWh
+  rating 200 kVA       valley-fill  LoL     26.6 h  hs max   67.0  peak K 0.532  h>120    0.0  charging 11.26 MWh
+  rating 200 kVA       no scooters  LoL     26.0 h  hs max   66.9  peak K 0.532  h>120    0.0  charging 0.0 MWh
+  charger 0.35 kW      plug-in      LoL    236.3 h  hs max  105.1  peak K 1.090  h>120    0.0  charging 11.25 MWh
+  charger 0.35 kW      after-peak   LoL    261.5 h  hs max  111.5  peak K 1.189  h>120    0.0  charging 11.25 MWh
+  charger 0.35 kW      latest       LoL    216.9 h  hs max  102.6  peak K 1.064  h>120    0.0  charging 11.25 MWh
+  charger 0.35 kW      valley-fill  LoL    217.2 h  hs max  103.3  peak K 1.064  h>120    0.0  charging 11.25 MWh
+  charger 0.35 kW      no scooters  LoL    199.5 h  hs max  102.6  peak K 1.064  h>120    0.0  charging 0.0 MWh
+  charger 1.0 kW       plug-in      LoL    251.0 h  hs max  108.4  peak K 1.138  h>120    0.0  charging 11.35 MWh
+  charger 1.0 kW       after-peak   LoL    293.7 h  hs max  113.9  peak K 1.372  h>120    0.0  charging 11.35 MWh
+  charger 1.0 kW       latest       LoL    215.8 h  hs max  103.1  peak K 1.109  h>120    0.0  charging 11.35 MWh
+  charger 1.0 kW       valley-fill  LoL    214.4 h  hs max  103.3  peak K 1.064  h>120    0.0  charging 11.35 MWh
+  charger 1.0 kW       no scooters  LoL    199.5 h  hs max  102.6  peak K 1.064  h>120    0.0  charging 0.0 MWh
+  energy x1.5          plug-in      LoL    257.9 h  hs max  106.2  peak K 1.101  h>120    0.0  charging 16.87 MWh
+  energy x1.5          after-peak   LoL    308.0 h  hs max  115.7  peak K 1.243  h>120    0.0  charging 16.87 MWh
+  energy x1.5          latest       LoL    230.3 h  hs max  103.4  peak K 1.073  h>120    0.0  charging 16.87 MWh
+  energy x1.5          valley-fill  LoL    228.6 h  hs max  103.7  peak K 1.064  h>120    0.0  charging 16.87 MWh
+  energy x1.5          no scooters  LoL    199.5 h  hs max  102.6  peak K 1.064  h>120    0.0  charging 0.0 MWh
+  all commuters        plug-in      LoL    216.1 h  hs max  103.3  peak K 1.064  h>120    0.0  charging 6.45 MWh
+  all commuters        after-peak   LoL    246.4 h  hs max  111.5  peak K 1.243  h>120    0.0  charging 6.45 MWh
+  all commuters        latest       LoL    209.8 h  hs max  102.6  peak K 1.064  h>120    0.0  charging 6.45 MWh
+  all commuters        valley-fill  LoL    210.1 h  hs max  103.4  peak K 1.064  h>120    0.0  charging 6.45 MWh
+  all commuters        no scooters  LoL    199.5 h  hs max  102.6  peak K 1.064  h>120    0.0  charging 0.0 MWh
+  half delivery        plug-in      LoL    297.5 h  hs max  110.2  peak K 1.154  h>120    0.0  charging 18.13 MWh
+  half delivery        after-peak   LoL    322.0 h  hs max  111.3  peak K 1.243  h>120    0.0  charging 18.13 MWh
+  half delivery        latest       LoL    226.9 h  hs max  102.7  peak K 1.064  h>120    0.0  charging 18.13 MWh
+  half delivery        valley-fill  LoL    225.4 h  hs max  103.2  peak K 1.064  h>120    0.0  charging 18.13 MWh
+  half delivery        no scooters  LoL    199.5 h  hs max  102.6  peak K 1.064  h>120    0.0  charging 0.0 MWh
+  PV on 30% of houses  plug-in      LoL    199.3 h  hs max  105.5  peak K 1.101  h>120    0.0  charging 11.26 MWh
+  PV on 30% of houses  after-peak   LoL    228.1 h  hs max  110.7  peak K 1.243  h>120    0.0  charging 11.26 MWh
+  PV on 30% of houses  latest       LoL    169.6 h  hs max  102.2  peak K 1.064  h>120    0.0  charging 11.26 MWh
+  PV on 30% of houses  valley-fill  LoL    170.7 h  hs max  102.7  peak K 1.064  h>120    0.0  charging 11.26 MWh
+  PV on 30% of houses  no scooters  LoL    160.1 h  hs max  102.2  peak K 1.064  h>120    0.0  charging 0.0 MWh
+  other random seed    plug-in      LoL    242.2 h  hs max  105.9  peak K 1.101  h>120    0.0  charging 11.26 MWh
+  other random seed    after-peak   LoL    271.4 h  hs max  111.4  peak K 1.243  h>120    0.0  charging 11.26 MWh
+  other random seed    latest       LoL    215.9 h  hs max  102.7  peak K 1.064  h>120    0.0  charging 11.26 MWh
+  other random seed    valley-fill  LoL    215.6 h  hs max  103.4  peak K 1.064  h>120    0.0  charging 11.26 MWh
+  other random seed    no scooters  LoL    199.5 h  hs max  102.6  peak K 1.064  h>120    0.0  charging 0.0 MWh
+D +2 K (extra base energy 29.7 MWh):
+  n= 0 plug-in      LoL    486.5 h  hs max  113.1  peak K 1.159  h>120    0.0
+  n=34 plug-in      LoL    608.7 h  hs max  116.6  peak K 1.196  h>120    0.0
+  n=34 after-peak   LoL    705.0 h  hs max  121.7  peak K 1.338  h>120    0.3
+  n=34 latest       LoL    526.0 h  hs max  113.1  peak K 1.159  h>120    0.0
+  n=34 valley-fill  LoL    526.0 h  hs max  113.7  peak K 1.159  h>120    0.0

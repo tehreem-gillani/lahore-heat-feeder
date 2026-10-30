@@ -1,0 +1,395 @@
+<title>Lahore Feeder Explorer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Public+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a working bench. Nameplate + question on top, controls beside results, two stacked week charts, method notes last. */
+:root {
+  --bg: #f5f6f3;
+  --panel: #ffffff;
+  --ink: #15191c;
+  --ink-2: #4f575c;
+  --ink-3: #7b8388;
+  --rule: #d9ddd8;
+  --accent: #1f5f8b;
+  --night: #2a78d6;
+  --timer: #eb6834;
+  --late: #14946a;
+  --base: #15191c;
+  --plate: #e8ebe6;
+  --warn: #b25a00;
+  --crit: #b3261e;
+  --good: #1d7a46;
+  --display: "Barlow Condensed", "Arial Narrow", sans-serif;
+  --body: "Public Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #111416; --panel: #191d20; --ink: #eceeec; --ink-2: #b4bbbf; --ink-3: #8a9296;
+    --rule: #2c3236; --accent: #6fb0e0; --night: #3987e5; --timer: #f07a4a; --late: #2bb582;
+    --base: #eceeec; --plate: #20262a; --warn: #e39a3b; --crit: #f0776f; --good: #4cc37f;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #111416; --panel: #191d20; --ink: #eceeec; --ink-2: #b4bbbf; --ink-3: #8a9296;
+  --rule: #2c3236; --accent: #6fb0e0; --night: #3987e5; --timer: #f07a4a; --late: #2bb582;
+  --base: #eceeec; --plate: #20262a; --warn: #e39a3b; --crit: #f0776f; --good: #4cc37f;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 15px; line-height: 1.5;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 24px 48px;
+}
+.wrap { max-width: 1120px; margin: 0 auto; display: flex; flex-direction: column; gap: 28px; }
+h1, h2 { font-family: var(--display); font-weight: 600; letter-spacing: 0.01em; text-wrap: balance; margin: 0; }
+h1 { font-size: clamp(30px, 5vw, 44px); line-height: 1.05; }
+h2 { font-size: 22px; }
+p { margin: 0; }
+.lede { color: var(--ink-2); max-width: 64ch; margin-top: 10px; }
+.top { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 24px; align-items: start; }
+.plate {
+  background: var(--plate); border: 1px solid var(--rule); border-radius: 6px; padding: 14px 16px;
+  font-family: var(--mono); font-size: 12px; color: var(--ink-2);
+}
+.plate .t { font-family: var(--display); font-size: 15px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink); margin-bottom: 8px; }
+.plate dl { display: grid; grid-template-columns: auto 1fr; gap: 3px 14px; margin: 0; }
+.plate dt { color: var(--ink-3); }
+.plate dd { margin: 0; color: var(--ink); font-variant-numeric: tabular-nums; }
+.bench { display: grid; grid-template-columns: 320px minmax(0, 1fr); gap: 24px; align-items: start; }
+.controls { display: flex; flex-direction: column; gap: 20px; background: var(--panel); border: 1px solid var(--rule); border-radius: 8px; padding: 18px; }
+.ctl { display: flex; flex-direction: column; gap: 8px; }
+.ctl label, .ctl .lbl { font-size: 12px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--ink-2); font-weight: 600; display: flex; justify-content: space-between; }
+.ctl output { font-family: var(--mono); color: var(--ink); letter-spacing: 0; text-transform: none; font-weight: 500; }
+input[type="range"] { width: 100%; accent-color: var(--accent); }
+.seg { display: flex; border: 1px solid var(--rule); border-radius: 6px; overflow: hidden; }
+.seg button { flex: 1; font: inherit; font-size: 14px; padding: 7px 4px; border: 0; background: transparent; color: var(--ink-2); cursor: pointer; font-variant-numeric: tabular-nums; }
+.seg button + button { border-left: 1px solid var(--rule); }
+.seg button[aria-pressed="true"] { background: var(--accent); color: var(--panel); font-weight: 600; }
+.rules { display: flex; flex-direction: column; gap: 6px; }
+.rule { display: grid; grid-template-columns: 14px 1fr; gap: 10px; align-items: start; padding: 8px 10px; border: 1px solid var(--rule); border-radius: 6px; cursor: pointer; background: transparent; text-align: left; font: inherit; color: var(--ink); }
+.rule[aria-pressed="true"] { border-color: var(--ink); box-shadow: inset 0 0 0 1px var(--ink); }
+.rule .sw { width: 14px; height: 14px; border-radius: 3px; margin-top: 3px; }
+.rule b { font-weight: 600; font-size: 14px; display: block; }
+.rule span { font-size: 12.5px; color: var(--ink-2); }
+button:focus-visible, input:focus-visible, select:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.results { display: flex; flex-direction: column; gap: 18px; min-width: 0; }
+.headline { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 16px; }
+.big { font-family: var(--display); font-size: clamp(54px, 9vw, 84px); font-weight: 700; line-height: 0.9; font-variant-numeric: tabular-nums; }
+.big.good { color: var(--good); } .big.warn { color: var(--warn); } .big.crit { color: var(--crit); }
+.headline .cap { color: var(--ink-2); max-width: 36ch; }
+.stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0; border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); }
+.stat { padding: 10px 12px 10px 0; }
+.stat + .stat { padding-left: 12px; border-left: 1px solid var(--rule); }
+.stat .k { font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--ink-3); }
+.stat .v { font-family: var(--mono); font-size: 20px; font-variant-numeric: tabular-nums; }
+.stat .s { font-size: 12px; color: var(--ink-3); font-family: var(--mono); }
+.cmp { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 14px; }
+th, td { text-align: right; padding: 7px 10px; border-bottom: 1px solid var(--rule); font-variant-numeric: tabular-nums; white-space: nowrap; }
+th:first-child, td:first-child { text-align: left; }
+th { font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.07em; color: var(--ink-3); font-weight: 600; }
+td .sw { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 8px; vertical-align: 0; }
+tr.sel td { font-weight: 600; }
+.charts { background: var(--panel); border: 1px solid var(--rule); border-radius: 8px; padding: 18px; display: flex; flex-direction: column; gap: 10px; }
+.charthead { display: flex; flex-wrap: wrap; gap: 10px 20px; justify-content: space-between; align-items: center; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 13px; color: var(--ink-2); }
+.legend i { display: inline-block; width: 16px; height: 3px; border-radius: 2px; vertical-align: middle; margin-right: 6px; }
+svg { display: block; width: 100%; height: auto; overflow: visible; }
+.axis text { fill: var(--ink-3); font-family: var(--mono); font-size: 11px; }
+.axis line { stroke: var(--rule); }
+.ylab { fill: var(--ink-2); font-size: 12px; font-family: var(--body); }
+.tip { position: absolute; pointer-events: none; background: var(--panel); border: 1px solid var(--rule); border-radius: 6px; padding: 6px 9px; font-family: var(--mono); font-size: 12px; color: var(--ink); white-space: nowrap; box-shadow: 0 2px 8px rgba(0,0,0,0.12); }
+.chartbox { position: relative; }
+.notes { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; color: var(--ink-2); font-size: 13.5px; }
+.notes h3 { font-family: var(--display); font-size: 16px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink); margin: 0 0 6px; font-weight: 600; }
+.notes p + p { margin-top: 8px; }
+.notes a { color: var(--accent); }
+.busy { opacity: 0.55; transition: opacity 0.15s; }
+@media (max-width: 860px) {
+  .top, .bench { grid-template-columns: 1fr; }
+  .notes { grid-template-columns: 1fr; }
+  .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .stat:nth-child(3) { padding-left: 0; border-left: 0; }
+  .stat:nth-child(n+3) { border-top: 1px solid var(--rule); }
+}
+@media (prefers-reduced-motion: reduce) { .busy { transition: none; } }
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div>
+      <h1>When should a Lahore street charge its e-scooters?</h1>
+      <p class="lede">Thirty-four Lahore homes, measured every minute from June 2018 to May 2019, put on one neighbourhood transformer. Add a scooter to some of them, pick when they charge, and see how much faster the transformer's insulation ages over a year. In this data the summer load peaks around midnight, so the charging time matters more than the energy.</p>
+    </div>
+    <aside class="plate" aria-label="Transformer model">
+      <div class="t">Model nameplate</div>
+      <dl>
+        <dt>Type</dt><dd>oil-immersed, ONAN</dd>
+        <dt>Voltage</dt><dd>11 / 0.4 kV</dd>
+        <dt>Rating</dt><dd id="plateRating">100 kVA</dd>
+        <dt>Loading guide</dt><dd>IEC 60076-7</dd>
+        <dt>Top-oil rise</dt><dd>55 K, τ<sub>o</sub> 180 min</dd>
+        <dt>Hot-spot grad.</dt><dd>23 K, τ<sub>w</sub> 4 min</dd>
+        <dt>Ageing ref.</dt><dd>98 °C, ×2 per 6 K</dd>
+        <dt>Load</dt><dd>34 houses, pf 0.95</dd>
+      </dl>
+    </aside>
+  </header>
+
+  <section class="bench">
+    <form class="controls" id="controls" onsubmit="return false">
+      <div class="ctl">
+        <label for="adopt">Houses with a scooter <output id="adoptOut">100%</output></label>
+        <input type="range" id="adopt" min="0" max="100" step="5" value="100">
+      </div>
+      <div class="ctl">
+        <label for="del">Of those, delivery riders <output id="delOut">20%</output></label>
+        <input type="range" id="del" min="0" max="100" step="5" value="20">
+      </div>
+      <div class="ctl">
+        <span class="lbl" id="chgLbl">Charger power</span>
+        <div class="seg" role="group" aria-labelledby="chgLbl" id="chg">
+          <button type="button" data-v="0.35" aria-pressed="false">0.35 kW</button>
+          <button type="button" data-v="0.5" aria-pressed="true">0.5 kW</button>
+          <button type="button" data-v="1" aria-pressed="false">1.0 kW</button>
+        </div>
+      </div>
+      <div class="ctl">
+        <span class="lbl" id="ratLbl">Transformer rating</span>
+        <div class="seg" role="group" aria-labelledby="ratLbl" id="rat">
+          <button type="button" data-v="75" aria-pressed="false">75 kVA</button>
+          <button type="button" data-v="100" aria-pressed="true">100 kVA</button>
+          <button type="button" data-v="200" aria-pressed="false">200 kVA</button>
+        </div>
+      </div>
+      <div class="ctl">
+        <span class="lbl" id="ruleLbl">When scooters charge</span>
+        <div class="rules" role="group" aria-labelledby="ruleLbl" id="rules">
+          <button type="button" class="rule" data-v="plug-in" aria-pressed="true"><i class="sw" style="background:var(--night)"></i><div><b>On arrival</b><span>Commuters plug in 18:00 to 19:30, delivery riders 22:30 to 23:30.</span></div></button>
+          <button type="button" class="rule" data-v="after-peak" aria-pressed="false"><i class="sw" style="background:var(--timer)"></i><div><b>Timer after the tariff peak</b><span>Start when the peak window ends: 23:00 in summer, 21:00 to 22:00 otherwise.</span></div></button>
+          <button type="button" class="rule" data-v="latest" aria-pressed="false"><i class="sw" style="background:var(--late)"></i><div><b>Finish at departure</b><span>Start late enough to end at 07:45 (commuters) or 10:45 (delivery).</span></div></button>
+        </div>
+      </div>
+    </form>
+
+    <div class="results" id="results">
+      <div class="headline">
+        <div class="big" id="big">+21%</div>
+        <p class="cap" id="bigCap">extra yearly insulation ageing compared with the same transformer and no scooters</p>
+      </div>
+      <div class="stats">
+        <div class="stat"><div class="k">Extra energy</div><div class="v" id="sE">11.3</div><div class="s">MWh per year</div></div>
+        <div class="stat"><div class="k">Peak load</div><div class="v" id="sK">1.07</div><div class="s" id="sK0">p.u., 10-min mean</div></div>
+        <div class="stat"><div class="k">Hottest spot</div><div class="v" id="sH">105</div><div class="s" id="sH0">°C in the year</div></div>
+        <div class="stat"><div class="k">Above 120 °C</div><div class="v" id="s120">0.0</div><div class="s" id="s1200">hours per year</div></div>
+      </div>
+      <div class="cmp">
+        <table aria-label="All charging rules for the current settings">
+          <thead><tr><th>Charging rule</th><th>Yearly ageing</th><th>vs. no scooters</th><th>Peak (p.u.)</th><th>Hours over rating</th></tr></thead>
+          <tbody id="cmpBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section class="charts" aria-label="Load and hot-spot temperature over four days">
+    <div class="charthead">
+      <h2>Four days up close</h2>
+      <div class="seg" role="group" aria-label="Choose days" id="wk" style="min-width:min(100%,360px)">
+        <button type="button" data-v="2" aria-pressed="true">3–6 Jun 2018</button>
+        <button type="button" data-v="65" aria-pressed="false">4–7 Aug 2018</button>
+        <button type="button" data-v="228" aria-pressed="false">14–17 Jan 2019</button>
+      </div>
+    </div>
+    <div class="legend" id="legend"></div>
+    <div class="chartbox"><svg id="chLoad" viewBox="0 0 1000 260" role="img" aria-label="Feeder load"></svg></div>
+    <div class="chartbox"><svg id="chHs" viewBox="0 0 1000 220" role="img" aria-label="Hot-spot temperature"></svg></div>
+  </section>
+
+  <section class="notes">
+    <div>
+      <h3>What is measured</h3>
+      <p>Household load comes from PRECON (LUMS): one-minute readings from 42 Lahore homes. 41 were in the download and 34 have every month at least half measured; those 34 are summed as if they shared one transformer. They are really spread over the city. Gap-filled minutes in the published files are replaced by the same house's mean for that month and hour.</p>
+      <p>Air temperature is NASA POWER hourly data for Lahore.</p>
+    </div>
+    <div>
+      <h3>What is modelled</h3>
+      <p>Scooter energy is 21.3 Wh/km at the battery (WMTC part 1, UN GTR No. 2 road load) and a charger efficiency of 0.85: a commuter rides 24 km a day, Monday to Saturday, and a delivery rider 96 km every day. The transformer follows the IEC 60076-7 difference equations for a distribution transformer, with air temperature as ambient.</p>
+      <p>The page stores load as 10-minute means, so peaks read a little lower than in the report, and its ageing results differ from the report by up to 2 percentage points.</p>
+    </div>
+    <div>
+      <h3>Read with care</h3>
+      <p>Houses per transformer, power factor, charger power and riding habits are assumptions. Absolute ageing depends heavily on the rating, so compare runs on the same rating. Peak windows are from NEPRA's 2026 LESCO tariff (clause 10).</p>
+      <p>Code, data and the full report: <a href="https://github.com/tehreem-gillani/lahore-heat-feeder" target="_blank" rel="noopener">github.com/tehreem-gillani/lahore-heat-feeder</a>. Syeda Tehreem Gillani, FAST-NUCES Karachi.</p>
+    </div>
+  </section>
+</div>
+
+<script>
+/*__ENGINE__*/
+</script>
+<script>
+const DATA = /*__DATA__*/;
+(function () {
+  const E = window.FeederEngine;
+  const ex = E.expand(DATA);
+  const RULES = ["plug-in", "after-peak", "latest"];
+  const NAMES = { "plug-in": "On arrival", "after-peak": "Timer after the tariff peak", "latest": "Finish at departure" };
+  const COL = { "plug-in": "var(--night)", "after-peak": "var(--timer)", "latest": "var(--late)" };
+  const state = { adoption: 1, shareDelivery: 0.2, chargerKw: 0.5, sRated: 100, rule: "plug-in", day0: 2 };
+  const $ = (id) => document.getElementById(id);
+  let cache = null;
+
+  function seg(id, key, parse) {
+    $(id).addEventListener("click", (e) => {
+      const b = e.target.closest("button"); if (!b) return;
+      for (const x of $(id).querySelectorAll("button")) x.setAttribute("aria-pressed", x === b ? "true" : "false");
+      state[key] = parse(b.dataset.v);
+      key === "day0" ? drawCharts() : schedule();
+    });
+  }
+  seg("chg", "chargerKw", Number);
+  seg("rat", "sRated", Number);
+  seg("wk", "day0", Number);
+  $("rules").addEventListener("click", (e) => {
+    const b = e.target.closest("button"); if (!b) return;
+    for (const x of $("rules").querySelectorAll("button")) x.setAttribute("aria-pressed", x === b ? "true" : "false");
+    state.rule = b.dataset.v; render();
+  });
+  $("adopt").addEventListener("input", (e) => { state.adoption = e.target.value / 100; $("adoptOut").textContent = e.target.value + "%"; schedule(); });
+  $("del").addEventListener("input", (e) => { state.shareDelivery = e.target.value / 100; $("delOut").textContent = e.target.value + "%"; schedule(); });
+
+  let timer = null;
+  function schedule() {
+    $("results").classList.add("busy");
+    clearTimeout(timer);
+    timer = setTimeout(compute, 120);
+  }
+
+  function compute() {
+    const p = { adoption: state.adoption, houses: 34, shareDelivery: state.shareDelivery, chargerKw: state.chargerKw, energyFactor: 1, sRated: state.sRated, seed: 1 };
+    const out = {};
+    let without = null;
+    for (const r of RULES) {
+      const res = E.run(ex, Object.assign({}, p, { rule: r }));
+      out[r] = res; without = res.without;
+    }
+    cache = { out, without };
+    $("results").classList.remove("busy");
+    $("plateRating").textContent = state.sRated + " kVA";
+    render();
+  }
+
+  const fmt = (x, d) => x.toFixed(d);
+  function render() {
+    if (!cache) return;
+    const r = cache.out[state.rule], w = cache.without;
+    const pct = (r.ratio - 1) * 100;
+    const big = $("big");
+    big.textContent = (pct >= 0 ? "+" : "") + Math.round(pct) + "%";
+    big.className = "big " + (pct < 12 ? "good" : pct < 30 ? "warn" : "crit");
+    $("bigCap").textContent = state.adoption === 0 ? "no scooters on the street yet: move the first slider"
+      : "extra yearly insulation ageing for “" + NAMES[state.rule].toLowerCase() + "”, compared with the same transformer and no scooters";
+    $("sE").textContent = fmt(r.chargingMwh, 1);
+    $("sK").textContent = fmt(r.withS.kMax, 2);
+    $("sK0").textContent = "p.u.; " + fmt(w.kMax, 2) + " without";
+    $("sH").textContent = fmt(r.withS.hsMax, 0);
+    $("sH0").textContent = "°C; " + fmt(w.hsMax, 0) + " without";
+    $("s120").textContent = fmt(r.withS.hours120, 1);
+    $("s1200").textContent = "h/yr; " + fmt(w.hours120, 1) + " without";
+    let rows = `<tr><td><i class="sw" style="background:var(--ink-3)"></i>No scooters</td><td>${fmt(w.lol, 0)} h</td><td>1.00</td><td>${fmt(w.kMax, 2)}</td><td>${fmt(w.hoursOver, 1)}</td></tr>`;
+    for (const k of RULES) {
+      const x = cache.out[k];
+      rows += `<tr class="${k === state.rule ? "sel" : ""}"><td><i class="sw" style="background:${COL[k]}"></i>${NAMES[k]}</td><td>${fmt(x.withS.lol, 0)} h</td><td>${fmt(x.ratio, 2)}</td><td>${fmt(x.withS.kMax, 2)}</td><td>${fmt(x.withS.hoursOver, 1)}</td></tr>`;
+    }
+    $("cmpBody").innerHTML = rows;
+    drawCharts();
+  }
+
+  const NS = "http://www.w3.org/2000/svg";
+  function el(tag, attrs, parent) { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); parent && parent.appendChild(e); return e; }
+
+  function lineChart(svg, H, series, yLab, ref, tipFmt) {
+    svg.innerHTML = "";
+    const W = 1000, m = { l: 54, r: 14, t: 10, b: 30 };
+    const n = series[0].y.length;
+    let lo = Infinity, hi = -Infinity;
+    for (const s of series) for (const v of s.y) { if (v < lo) lo = v; if (v > hi) hi = v; }
+    if (ref) { hi = Math.max(hi, ref.v); lo = Math.min(lo, ref.v); }
+    const step = niceStep((hi - lo) / 5);
+    lo = Math.floor(lo / step) * step; hi = Math.ceil(hi / step) * step;
+    const X = (i) => m.l + (W - m.l - m.r) * i / (n - 1);
+    const Y = (v) => m.t + (H - m.t - m.b) * (1 - (v - lo) / (hi - lo));
+    const ax = el("g", { class: "axis" }, svg);
+    for (let v = lo; v <= hi + 1e-9; v += step) {
+      el("line", { x1: m.l, x2: W - m.r, y1: Y(v), y2: Y(v) }, ax);
+      const t = el("text", { x: m.l - 8, y: Y(v) + 4, "text-anchor": "end" }, ax); t.textContent = Math.round(v);
+    }
+    for (let d = 0; d <= 4; d++) {
+      const i = Math.min(d * 144, n - 1);
+      const date = new Date(ex.start.getTime() + (state.day0 + d) * 86400000);
+      const t = el("text", { x: X(i), y: H - 8, "text-anchor": d === 0 ? "start" : d === 4 ? "end" : "middle" }, ax);
+      t.textContent = date.getUTCDate() + " " + date.toLocaleString("en", { month: "short", timeZone: "UTC" }) + " 00:00";
+      if (d > 0 && d < 4) el("line", { x1: X(i), x2: X(i), y1: m.t, y2: H - m.b }, ax);
+    }
+    const yl = el("text", { class: "ylab", x: 0, y: 0, transform: `translate(12 ${(H - m.b + m.t) / 2}) rotate(-90)`, "text-anchor": "middle" }, svg);
+    yl.textContent = yLab;
+    if (ref) {
+      el("line", { x1: m.l, x2: W - m.r, y1: Y(ref.v), y2: Y(ref.v), stroke: "var(--ink-3)", "stroke-dasharray": "5 4", "stroke-width": 1.2 }, svg);
+      const t = el("text", { x: W - m.r, y: Y(ref.v) - 6, "text-anchor": "end", class: "ylab" }, svg); t.textContent = ref.label;
+    }
+    for (const s of series) {
+      let d = "";
+      for (let i = 0; i < n; i++) d += (i ? "L" : "M") + X(i).toFixed(1) + " " + Y(s.y[i]).toFixed(1);
+      el("path", { d, fill: "none", stroke: s.color, "stroke-width": s.w || 2, "stroke-linejoin": "round" }, svg);
+    }
+    // hover
+    const box = svg.parentNode;
+    let tip = box.querySelector(".tip");
+    if (!tip) { tip = document.createElement("div"); tip.className = "tip"; tip.hidden = true; box.appendChild(tip); }
+    const cross = el("line", { y1: m.t, y2: H - m.b, stroke: "var(--ink-3)", "stroke-width": 1, visibility: "hidden" }, svg);
+    const hit = el("rect", { x: m.l, y: m.t, width: W - m.l - m.r, height: H - m.t - m.b, fill: "transparent" }, svg);
+    hit.addEventListener("pointermove", (ev) => {
+      const r = svg.getBoundingClientRect();
+      const fx = (ev.clientX - r.left) / r.width * W;
+      const i = Math.max(0, Math.min(n - 1, Math.round((fx - m.l) / (W - m.l - m.r) * (n - 1))));
+      cross.setAttribute("x1", X(i)); cross.setAttribute("x2", X(i)); cross.setAttribute("visibility", "visible");
+      const min = (state.day0 * 1440) + i * 10;
+      const hh = String(Math.floor((min % 1440) / 60)).padStart(2, "0"), mm = String(min % 60).padStart(2, "0");
+      tip.innerHTML = `${hh}:${mm}<br>` + series.map((s) => `<span style="color:${s.color}">■</span> ${s.name}: ${tipFmt(s.y[i])}`).join("<br>");
+      tip.hidden = false;
+      const px = (X(i) / W) * r.width;
+      tip.style.left = Math.min(px + 12, r.width - tip.offsetWidth - 4) + "px";
+      tip.style.top = "8px";
+    });
+    hit.addEventListener("pointerleave", () => { tip.hidden = true; cross.setAttribute("visibility", "hidden"); });
+  }
+  function niceStep(raw) { const p = Math.pow(10, Math.floor(Math.log10(raw))); const f = raw / p; return (f < 1.5 ? 1 : f < 3 ? 2 : f < 7 ? 5 : 10) * p; }
+
+  function drawCharts() {
+    if (!cache) return;
+    const r = cache.out[state.rule], w = cache.without;
+    const a = state.day0 * 1440, b = a + 4 * 1440;
+    const base = [], withS = [], hs0 = [], hs1 = [], air = [];
+    for (let i = a; i < b; i += 10) {
+      let s0 = 0, s1 = 0;
+      for (let j = i; j < i + 10; j++) { s0 += ex.base[j]; s1 += ex.base[j] + r.ch[j]; }
+      base.push(s0 / 10); withS.push(s1 / 10);
+      hs0.push(w.hs[i]); hs1.push(r.withS.hs[i]); air.push(ex.tAir[i]);
+    }
+    const c = COL[state.rule];
+    $("legend").innerHTML = `<span><i style="background:${c}"></i>with scooters, ${NAMES[state.rule].toLowerCase()}</span><span><i style="background:var(--base)"></i>no scooters</span><span><i style="background:var(--ink-3)"></i>air temperature</span>`;
+    lineChart($("chLoad"), 260, [{ y: withS, color: c, name: "with scooters" }, { y: base, color: "var(--base)", name: "no scooters", w: 1.2 }],
+      "feeder load (kW)", { v: state.sRated * 0.95, label: state.sRated + " kVA at pf 0.95" }, (v) => v.toFixed(1) + " kW");
+    lineChart($("chHs"), 220, [{ y: hs1, color: c, name: "hot spot, with" }, { y: hs0, color: "var(--base)", name: "hot spot, without", w: 1.2 }, { y: air, color: "var(--ink-3)", name: "air", w: 1 }],
+      "temperature (°C)", null, (v) => v.toFixed(1) + " °C");
+  }
+
+  compute();
+})();
+</script>
